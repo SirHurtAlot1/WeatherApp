@@ -47,7 +47,9 @@ class _WeatherPageState extends State<WeatherPage> {
                 Container(
                   decoration: BoxDecoration(
                       image: DecorationImage(
-                          image: AssetImage(constants.nightBackgroundImagePath),
+                          image: AssetImage(isDay
+                              ? constants.dayBackgroundImagePath
+                              : constants.nightBackgroundImagePath),
                           fit: BoxFit.cover)),
                 ),
                 Scaffold(
@@ -65,7 +67,9 @@ class _WeatherPageState extends State<WeatherPage> {
                                   const EdgeInsets.only(top: 25, bottom: 20),
                               child: Text(
                                   snapshot.data!.locationData.locationName,
-                                  style: constants.locationTextStl),
+                                  style: isDay
+                                      ? constants.dayLocationTextStl
+                                      : constants.nightLocationTextStl),
                             ),
                             Container(
                               alignment: Alignment.centerLeft,
@@ -73,7 +77,9 @@ class _WeatherPageState extends State<WeatherPage> {
                                   const EdgeInsets.only(top: 250, bottom: 20),
                               child: Text(
                                 '${snapshot.data!.condition.temp.toInt()} °',
-                                style: constants.mainTempTextStl,
+                                style: isDay
+                                    ? constants.dayMainTempTextStl
+                                    : constants.nightMainTempTextStl,
                               ),
                             ),
                             WeatherGrid(snapshot: snapshot)
@@ -95,32 +101,43 @@ class _WeatherPageState extends State<WeatherPage> {
 
   AppBar _buildAppBar() {
     return AppBar(
+      centerTitle: false,
+      leadingWidth: 0,
       elevation: 0,
       backgroundColor: Colors.transparent,
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.refresh,
-                size: 35,
-              )),
-          IconButton(
-              onPressed: () {},
-              icon: const Text(
-                '°C',
-                style: TextStyle(fontSize: 30),
-              ))
-        ],
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 10),
+        child: IconButton(
+            onPressed: () {},
+            icon: Icon(
+              Icons.refresh,
+              size: 35,
+              color: isDay
+                  ? constants.dayTextAndIconColor
+                  : constants.nightTextAndIconColor,
+            )),
       ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 20),
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: RichText(
+                text: TextSpan(
+                    text: 'About',
+                    style: isDay
+                        ? constants.dayAppBarLeadingTextStl
+                        : constants.nightAppBarLeadingTextStl)),
+          ),
+        )
+      ],
     );
   }
 }
 
 Future<Weather> getWeather() async {
   final response = await http.get(Uri.parse(
-      'http://api.weatherapi.com/v1/current.json?key=439bcec77514469aa64133111230901&q=Kazan&aqi=no'));
+      'http://api.weatherapi.com/v1/current.json?key=439bcec77514469aa64133111230901&q=Chicago&aqi=no'));
 
   if (response.statusCode == 200) {
     return Weather.fromJson(jsonDecode(response.body));

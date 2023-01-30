@@ -1,21 +1,30 @@
 import 'package:flutter/material.dart';
-import 'constants.dart' as Constants;
+import 'constants.dart' as constants;
 
 class WeatherCard extends StatelessWidget {
   final IconData iconData;
   final String description;
   final String data;
+  final Color cardColor;
+  final Color iconColor;
+  final TextStyle descriptionTextStyle;
+  final TextStyle mainTextStyle;
+
   const WeatherCard(
       {super.key,
       required this.iconData,
       required this.description,
-      required this.data});
+      required this.data,
+      required this.cardColor,
+      required this.iconColor,
+      required this.descriptionTextStyle,
+      required this.mainTextStyle});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Constants.cardNightColor,
+        color: cardColor,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Padding(
@@ -26,26 +35,14 @@ class WeatherCard extends StatelessWidget {
           children: [
             Icon(
               iconData,
-              color: Constants.textAndIconNightColor,
+              color: iconColor,
               size: 35,
             ),
             Padding(
               padding: const EdgeInsets.only(top: 40),
-              child: Text(
-                description,
-                style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500),
-              ),
+              child: Text(description, style: descriptionTextStyle),
             ),
-            Text(
-              data,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 30),
-            )
+            Text(data, style: mainTextStyle)
           ],
         ),
       ),
