@@ -24,7 +24,6 @@ class _WeatherPageState extends State<WeatherPage> {
       setState(() {
         forecast = getWeather();
       });
-      print('timer worked');
     });
 
     super.initState();
