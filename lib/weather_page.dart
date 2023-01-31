@@ -6,6 +6,7 @@ import 'package:flutter_application_1/weather.dart';
 import 'package:http/http.dart' as http;
 import 'constants.dart' as constants;
 import 'weather_grid.dart';
+import 'package:geolocator/geolocator.dart';
 
 class WeatherPage extends StatefulWidget {
   const WeatherPage({super.key});
@@ -18,9 +19,10 @@ class _WeatherPageState extends State<WeatherPage> {
   late bool isDay;
   late Future<Weather> forecast = getWeather();
   late Timer timer;
+
   @override
   initState() {
-    timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    timer = Timer.periodic(const Duration(minutes: 30), (timer) {
       setState(() {
         forecast = getWeather();
       });
@@ -55,36 +57,42 @@ class _WeatherPageState extends State<WeatherPage> {
                   backgroundColor: Colors.transparent,
                   extendBodyBehindAppBar: false,
                   appBar: _buildAppBar(),
-                  body: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Container(
-                              alignment: Alignment.centerLeft,
-                              margin:
-                                  const EdgeInsets.only(top: 25, bottom: 20),
-                              child: Text(
-                                  snapshot.data!.locationData.locationName,
-                                  style: isDay
-                                      ? constants.dayLocationTextStl
-                                      : constants.nightLocationTextStl),
-                            ),
-                            Container(
-                              alignment: Alignment.centerLeft,
-                              margin:
-                                  const EdgeInsets.only(top: 250, bottom: 20),
-                              child: Text(
-                                '${snapshot.data!.condition.temp.toInt()} °',
-                                style: isDay
-                                    ? constants.dayMainTempTextStl
-                                    : constants.nightMainTempTextStl,
+                  body: NotificationListener<OverscrollIndicatorNotification>(
+                    onNotification: (overScroll) {
+                      overScroll.disallowIndicator();
+                      return true;
+                    },
+                    child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              Container(
+                                alignment: Alignment.centerLeft,
+                                margin:
+                                    const EdgeInsets.only(top: 25, bottom: 20),
+                                child: Text(
+                                    snapshot.data!.locationData.locationName,
+                                    style: isDay
+                                        ? constants.dayLocationTextStl
+                                        : constants.nightLocationTextStl),
                               ),
-                            ),
-                            WeatherGrid(snapshot: snapshot)
-                          ],
-                        ),
-                      )),
+                              Container(
+                                alignment: Alignment.centerLeft,
+                                margin:
+                                    const EdgeInsets.only(top: 250, bottom: 20),
+                                child: Text(
+                                  '${snapshot.data!.condition.temp.toInt()} °',
+                                  style: isDay
+                                      ? constants.dayMainTempTextStl
+                                      : constants.nightMainTempTextStl,
+                                ),
+                              ),
+                              WeatherGrid(snapshot: snapshot)
+                            ],
+                          ),
+                        )),
+                  ),
                 ),
               ],
             ),
@@ -104,18 +112,6 @@ class _WeatherPageState extends State<WeatherPage> {
       leadingWidth: 0,
       elevation: 0,
       backgroundColor: Colors.transparent,
-      leading: Padding(
-        padding: const EdgeInsets.only(left: 10),
-        child: IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.refresh,
-              size: 35,
-              color: isDay
-                  ? constants.dayTextAndIconColor
-                  : constants.nightTextAndIconColor,
-            )),
-      ),
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 20),
@@ -134,9 +130,36 @@ class _WeatherPageState extends State<WeatherPage> {
   }
 }
 
+Future<Position> _determinePosition() async {
+  bool serviceEnabled;
+  LocationPermission permission;
+
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    return Future.error('Location services are disabled.');
+  }
+
+  permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      return Future.error('Location permissions are denied');
+    }
+  }
+
+  if (permission == LocationPermission.deniedForever) {
+    return Future.error(
+        'Location permissions are permanently denied, we cannot request permissions.');
+  }
+
+  return await Geolocator.getCurrentPosition();
+}
+
 Future<Weather> getWeather() async {
+  final position = await _determinePosition();
+
   final response = await http.get(Uri.parse(
-      'http://api.weatherapi.com/v1/current.json?key=439bcec77514469aa64133111230901&q=Chicago&aqi=no'));
+      'http://api.weatherapi.com/v1/current.json?key=439bcec77514469aa64133111230901&q=${position.latitude},${position.longitude}&aqi=no'));
 
   if (response.statusCode == 200) {
     return Weather.fromJson(jsonDecode(response.body));

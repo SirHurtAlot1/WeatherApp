@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'constants.dart' as constants;
 
 class WeatherCard extends StatelessWidget {
   final IconData iconData;

@@ -10,24 +10,20 @@ class Weather {
 
   factory Weather.fromJson(Map<String, dynamic> json) {
     return Weather(
-      locationData:
-          LocationData.fromJson(json['location'] as Map<String, dynamic>),
-      condition: CurrentConditionData.fromJson(
-          json['current'] as Map<String, dynamic>),
+      locationData: LocationData.fromJson(json['location']),
+      condition: CurrentConditionData.fromJson(json['current']),
     );
   }
 }
 
 class LocationData {
   String locationName;
-  DateTime date;
 
-  LocationData({required this.locationName, required this.date});
+  LocationData({required this.locationName});
 
   factory LocationData.fromJson(Map<String, dynamic> json) {
     return LocationData(
       locationName: json['name'] as String,
-      date: DateTime.parse(json['localtime']),
     );
   }
 }
