@@ -1,16 +1,15 @@
-# WeatherApp
+# The simplies ever weather mobile app!
 
-Simple weather app with Flutter
+App shows current weather condition depending on the user location. Design also changes between day and night.
 
-## Getting Started
+## Used packages:
+1. [http](https://pub.dev/packages/http) - used to get weather data using [weatherapi.com](https://www.weatherapi.com/)
+2. [weather_icons](https://pub.dev/packages/weather_icons) - used for app design
+3. [geolocator](https://pub.dev/packages/geolocator) - used to get current geolocation of user
 
-This project is a starting point for a Flutter application.
+Backgrounds by [Prem](https://dribbble.com/premgurusamy)
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+
