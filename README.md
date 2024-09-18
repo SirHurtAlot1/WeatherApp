@@ -1,4 +1,4 @@
-# The simplies ever weather mobile app!
+# Simple weather app
 
 App shows current weather condition depending on the user location. Design also changes between day and night.
 
